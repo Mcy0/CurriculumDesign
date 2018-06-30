@@ -377,7 +377,6 @@ void write_file(stu *head)  //用链表，生成文件
 		fputc('\n',fp);
 	}
 	fclose(fp);
-	printf("完成\n");
 }
 void header()//数据表头
 {
@@ -449,6 +448,400 @@ void sort(stu *head) //根据公寓 宿舍 床位 排序
 	}
 	
 }
+void add(stu *head)//添加数据 
+{
+	stu *end;
+	for(end=head->next;end->next!=NULL;end=end->next){}
+	stu *p;
+	char id[20];
+	printf("\t输入学号:");
+	fflush(stdin);
+	gets(id);
+	while(strlen(id)>0)
+	{
+		
+		if(find_id(id,head))//学号查重,重复返回0，否则1 
+		{
+			p=(stu*)malloc(sizeof(stu));
+			p->next=NULL;
+			strcpy(p->id,id);
+			printf("\t输入姓名:");	
+			gets(p->name);
+			printf("\t输入公寓名称:");			
+			scanf("%s",p->dorm);
+			printf("\t输入宿舍名称:");
+			scanf("%d",&p->dorm_num);
+			printf("\t输入床位号:");
+			scanf("%d",&p->dorm_num_id);
+			if(find_check(head,p))  //检查宿舍是否满员,符合返回1，不符合返回0 
+			{		
+				printf("\t手机号:");
+				fflush(stdin);
+				gets(p->number); 
+				printf("\t年龄:");
+				scanf("%d",&p->age); 
+				printf("\t性别:");
+				scanf("%s",p->sex); 
+				printf("\t专业班级:");
+				scanf("%s %d",p->major,&p->banji);
+				printf("\t输入入学年份:");
+				scanf("%d",&p->enUniversity);	
+				end->next=p;
+				end=p;	
+			} 	
+		}
+		printf("\t输入学号:");
+		fflush(stdin);
+		gets(id);
+	}
+	printf("\t结束\n");
+}
+void dele(stu *head)//按学号删除数据 
+{
+	printf("\t输入你要删除的学号:");
+	char id[20];
+	fflush(stdin);
+	gets(id);
+	stu *end1;//倒数第二个 	
+	stu *i;
+	while(strlen(id)>0)
+	{
+		for(end1=head->next;end1->next->next!=NULL;end1=end1->next){}
+		i=head->next;
+		while((i=i->next)!=NULL)
+		{
+			if(strcmp(id,i->id)==0)
+			{
+				exchange(i,end1->next);
+				free(end1->next);
+				end1->next=NULL;
+				sort(head);
+				printf("\t成功\n");
+				break;
+			}
+			else if(i->next==NULL)
+			{
+				printf("\t->未找到相匹配的学号<-\n");
+			}
+		}
+		printf("\t输入你要删除的学号:");
+		gets(id);
+	}	
+}
+void modify(stu *head)//按学号修改数据 
+{
+	char flag[5];
+	printf("\t输入你要修改的学号:");
+	char id[20];
+	char new_id[20];
+	fflush(stdin);
+	gets(id);
+	stu *i;
+	stu *k;
+	k=(stu*)malloc(sizeof(stu));
+	k->next=NULL;
+	while(strlen(id)>0)
+	{	
+		i=head;
+		while((i=i->next)!=NULL)
+		{
+			if(strcmp(id,i->id)==0)
+			{
+				printf("\t是否修改学号(yes/no):") ;
+				gets(flag);
+				if(strcmp(flag,"yes")==0)
+				{
+					printf("\t输入修改的学号:");
+					gets(new_id);
+					if(find_id(new_id,head)||strcmp(id,new_id)==0)
+					{
+						strcpy(k->id,new_id);
+					}
+					else
+					{
+						printf("\t新学号重复");
+						break;
+					}
+				}
+				else
+				{
+					strcpy(k->id,i->id);
+				} 
+				printf("\t输入姓名:");	
+				gets(k->name);
+				printf("\t输入公寓名称:");			
+				scanf("%s",k->dorm);
+				printf("\t输入宿舍名称:");
+				scanf("%d",&k->dorm_num);
+				printf("\t输入床位号:");
+				scanf("%d",&k->dorm_num_id);
+				if(find_check(head,k)||(!strcmp(k->dorm,i->dorm)&&i->dorm_num==k->dorm_num&&i->dorm_num_id==k->dorm_num_id))  //检查宿舍是否满员,符合返回1，不符合返回0 
+				{		
+					printf("\t手机号:");
+					fflush(stdin);
+					gets(k->number); 
+					printf("\t年龄:");
+					scanf("%d",&k->age); 
+					printf("\t性别:");
+					scanf("%s",k->sex); 
+					printf("\t专业班级:");
+					scanf("%s %d",k->major,&k->banji);
+					printf("\t输入入学年份:");
+					scanf("%d",&k->enUniversity);
+					
+					exchange(i,k);
+				} 				
+			}
+			else if(i->next==NULL)
+			{
+				printf("\t->未找到相匹配的学号<-\n");
+			}
+		}
+		printf("\t输入你要修改的学号:");
+		fflush(stdin);
+		gets(id);
+	}	
+	free(k);
+}
+void interface1()//数据查询子界面 
+{
+	printf("\t\t------------------\n");
+	printf("\t\t|1.按学号查询    |\n");
+	printf("\t\t|2.按姓名查询    |\n");
+	printf("\t\t|3.按公寓宿舍查询|\n");
+	printf("\t\t------------------\n");
+}
+void lookup_id(stu *head)//按学号查找 
+{
+	char id[20];
+	printf("\t输入学号:");
+	fflush(stdin);
+	gets(id);
+	stu *i;
+	while(strlen(id)>0)
+	{	
+		i=head;
+		while((i=i->next)!=NULL)
+		{
+			if(strcmp(id,i->id)==0)
+			{
+				header();
+				printf("\t|%-10s%-8s%-9s%-5d%-10s%-5d%-5d%-5s%-5d%-12s%-5d|\n",i->id,i->name,i->major,i->banji,i->dorm,i->dorm_num,i->dorm_num_id,i->sex,i->age,i->number,i->enUniversity);
+				printf("\t---------------------------------------------------------------------------------\n");
+				break;
+			}
+			else if(i->next==NULL)
+			{
+				printf("\t未找到相应学号\n");
+			}
+		}
+		printf("\t输入学号:");
+		fflush(stdin);
+		gets(id);
+	}
+}
+void lookup_name(stu *head)//按姓名查找 
+{
+	char name[20];
+	printf("\t输入姓名:");
+	fflush(stdin);
+	
+	gets(name);
+	stu *i;
+	int flag;//判断是否找到数据，1找到，0枚找到 
+	int flag1;//判断是否输出表头 ，1输出，0不输出
+	flag1=1; 
+	while(strlen(name)>0)
+	{	flag=0;
+		i=head;
+		while((i=i->next)!=NULL)
+		{
+			if(strcmp(name,i->name)==0)
+			{
+				if(flag1==1)
+				{
+					header();
+					flag1=0;
+				}				
+				printf("\t|%-10s%-8s%-9s%-5d%-10s%-5d%-5d%-5s%-5d%-12s%-5d|\n",i->id,i->name,i->major,i->banji,i->dorm,i->dorm_num,i->dorm_num_id,i->sex,i->age,i->number,i->enUniversity);
+				flag=1;
+			}
+			else if(i->next==NULL&&flag==0)
+			{
+				printf("\t未找到相应姓名\n");
+			}
+		}
+		printf("\t---------------------------------------------------------------------------------\n");
+		printf("\n");
+		printf("\t输入姓名:");
+		fflush(stdin);
+		gets(name);
+	}
+}
+void lookup_dorm_num(stu *head)//按公寓宿舍查找 
+{
+	int  num=0;
+	char dorm[20];
+	printf("\t输入公寓和宿舍号:");
+	scanf("%s %d",dorm,&num);
+	stu *i;
+	int flag;//判断是否找到数据，1找到，0枚找到 
+	int flag1;//判断是否输出表头 ，1输出，0不输出
+	flag1=1; 
+	while(strlen(dorm)>0&&num!=0)
+	{	flag=0;
+		i=head;
+		while((i=i->next)!=NULL)
+		{
+			if(num==i->dorm_num&&strcmp(dorm,i->dorm)==0)
+			{
+				if(flag1==1)
+				{
+					header();
+					flag1=0;
+				}				
+				printf("\t|%-10s%-8s%-9s%-5d%-10s%-5d%-5d%-5s%-5d%-12s%-5d|\n",i->id,i->name,i->major,i->banji,i->dorm,i->dorm_num,i->dorm_num_id,i->sex,i->age,i->number,i->enUniversity);
+				flag=1;
+			}
+			else if(i->next==NULL&&flag==0)
+			{
+				printf("\t未找到相应宿舍号\n");
+			}
+		}
+		printf("\t---------------------------------------------------------------------------------\n");
+		printf("\n");
+		num=0;
+		printf("\t输入公寓和宿舍号:");
+		scanf("%s %d",dorm,&num);
+	}
+}
+void son_operation(stu *head)//查询操作选项表 
+{
+	
+	printf("\t输入选项(0退出):");
+	int choice;
+	scanf("%d",&choice);
+	if(choice==0)
+	{
+		return;
+	}
+	switch(choice)
+	{
+		case 1:{
+			lookup_id(head);//按id查询 
+			break;
+		}
+		case 2:{
+			lookup_name(head);//按姓名查询 
+			break;
+		}
+		case 3:{
+			lookup_dorm_num(head);//按公寓宿舍查询 
+			break;
+		}
+		default :{
+			printf("\t->输入格式有误<-\n");
+			break;
+		} 
+	}
+}
+void son_statistical()//统计操作表子目录 
+{
+	printf("\t\t----------------\n");
+	printf("\t\t|1.统计总人数  |\n");
+	printf("\t\t|2.统计单个公寓|\n");
+	printf("\t\t|3.统计公寓宿舍|\n");
+	printf("\t\t----------------\n");
+}
+void  statistical_total(stu *head)//统计总人数
+{
+	stu *i;
+	int n=0;
+	for(i=head->next;i!=NULL;i=i->next)
+	{
+		n++;
+	}
+	printf("\t->共%d人<-\n",n); 
+}
+void statistical_dorm(stu *head)//统计单个公寓
+{
+	int n=0;
+	char dorm[20];
+	printf("\t输入公寓:");
+	fflush(stdin);
+	gets(dorm);
+	stu *i;
+	while(strlen(dorm)>0)
+	{	
+		i=head;
+		n=0;
+		while((i=i->next)!=NULL)
+		{
+			if(strcmp(dorm,i->dorm)==0)
+			{
+				n++;
+			}		
+		}
+		printf("\t->该公寓共%d人<-\n",n);
+		printf("\t输入公寓:");
+		fflush(stdin);
+		gets(dorm);
+	}
+}
+void statistical_dorm_num(stu *head)//统计公寓宿舍
+{
+	int  num=0;
+	int n;
+	char dorm[20];
+	printf("\t输入公寓和宿舍号:");
+	scanf("%s %d",dorm,&num);
+	stu *i;
+	while(strlen(dorm)>0&&num!=0)
+	{	n=0;
+		i=head;
+		while((i=i->next)!=NULL)
+		{
+			if(num==i->dorm_num&&strcmp(dorm,i->dorm)==0)
+			{			
+					n++;
+			}
+			
+		}		
+		printf("\t->该宿舍工%d人<-\n",n);
+		num=0;
+		printf("\t输入公寓和宿舍号:");
+		scanf("%s %d",dorm,&num);
+	}
+}
+void statistical_operation(stu *head) //统计操作选项表 
+{
+	printf("\t输入选项(0退出):");
+	int choice;
+	scanf("%d",&choice);
+	if(choice==0)
+	{
+		return;
+	}
+	switch(choice)
+	{
+		case 1:{
+			statistical_total(head);//统计总人数
+			break;
+		}
+		case 2:{
+			statistical_dorm(head);//统计单个公寓
+			break;
+		}
+		case 3:{
+			statistical_dorm_num(head);//统计公寓宿舍
+			break;
+		}
+		default :{
+			printf("\t->输入格式有误<-\n");
+			break;
+		} 
+	}
+} 
 int main() 
 {	
 	//enter();//登录 
@@ -471,23 +864,35 @@ int main()
 				break;
 			}
 			case 2:{//增加 
-				
+				head=write_linked();
+				add(head);
+				sort(head);
+				write_file(head);
 				break;
 			}
 			case 3:{ //按学号删除 
-				
+				head=write_linked();
+				dele(head);
+				write_file(head);
 				break;
 			}
 			case 4:{//改按学号 
-				
+				head=write_linked();
+				modify(head);
+				write_file(head);
 				break;
 			}
 			case 5:{//查，按姓名，宿舍，学号 
-				
+				interface1();//子目录 
+				head=write_linked();
+				son_operation(head);
 				break;
 			}
 			case 6:{ //统计，总人数，每个宿舍人数，一个楼人数 
-				
+				head=write_linked();
+				son_statistical();
+				statistical_operation(head); 
+				//statistical_date(); 
 				break;
 			}
 			case 7:{//报表 
@@ -509,9 +914,6 @@ int main()
 		getchar();
 		system("cls");
 	}
-	
-	
-	
 }
 
 
