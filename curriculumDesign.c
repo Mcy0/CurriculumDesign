@@ -507,7 +507,7 @@ void dele(stu *head)//按学号删除数据
 	while(strlen(id)>0)
 	{
 		for(end1=head->next;end1->next->next!=NULL;end1=end1->next){}
-		i=head->next;
+		i=head;
 		while((i=i->next)!=NULL)
 		{
 			if(strcmp(id,i->id)==0)
@@ -844,7 +844,7 @@ void statistical_operation(stu *head) //统计操作选项表
 } 
 int main() 
 {	
-	//enter();//登录 
+	enter();//登录 
 	system("cls");
 	printf("\t登陆成功\n");
 	int choice;
